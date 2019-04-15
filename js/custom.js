@@ -119,7 +119,8 @@ $(document).ready(function(){
 
 // ==========  START GOOGLE MAP ========== //
 function initialize() {
-    var myLatLng = new google.maps.LatLng(22.402789, 91.822156);
+
+  /*var myLatLng = new google.maps.LatLng(22.402789, 91.822156);
 
     var mapOptions = {
         zoom: 14,
@@ -144,8 +145,8 @@ function initialize() {
         icon: 'img/location-icon.png',
         title: '',
     });
-
+*/
 }
 
-google.maps.event.addDomListener(window, "load", initialize);
+//google.maps.event.addDomListener(window, "load", initialize);
 // ========== END GOOGLE MAP ========== //
