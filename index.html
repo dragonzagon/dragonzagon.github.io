@@ -244,6 +244,11 @@
       cursor: pointer;
     }
 
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
     .note, #sent {
       margin: 0;
       color: var(--muted);
@@ -320,7 +325,7 @@
       <label class="stack">Tu correo
         <input name="correo" type="email" autocomplete="email" required>
       </label>
-      <button type="submit">Pedir esta cotización</button>
+      <button type="submit">Quiero este paquete</button>
       <p id="sent" hidden></p>
     </form>
   </main>
@@ -353,10 +358,13 @@
       maximumFractionDigits: 0
     });
 
+    const QUOTE_URL = "https://q77ekfax6x3plc5f7hloc4q3ty0nprbo.lambda-url.us-west-2.on.aws/";
     const linesEl = document.querySelector("#lines");
     const totalEl = document.querySelector("#total");
     const hintEl = document.querySelector("#hint");
     const sentEl = document.querySelector("#sent");
+    const submitEl = document.querySelector("#paquete button");
+    let locked = false;
 
     function quote() {
       const digital = document.querySelector("#cover-digital").checked;
@@ -409,12 +417,13 @@
       hintEl.textContent = q.publish && !q.epub && !q.print
         ? "Para publicarlo en KDP necesito el EPUB, el PDF de la tapa blanda, o los dos."
         : "";
-      sentEl.hidden = true;
+      if (!locked) sentEl.hidden = true;
     }
 
     document.querySelector("#paquete").addEventListener("input", render);
-    document.querySelector("#paquete").addEventListener("submit", (event) => {
+    document.querySelector("#paquete").addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (locked) return;
       const data = new FormData(event.currentTarget);
       const q = quote();
       if (q.items.length === 0) {
@@ -422,8 +431,39 @@
         sentEl.textContent = "Elige al menos una parte del paquete.";
         return;
       }
+      locked = true;
+      submitEl.disabled = true;
       sentEl.hidden = false;
-      sentEl.textContent = data.get("nombre") + ", la cotización de " + money.format(q.total) + " queda a nombre de " + data.get("correo") + ". Todavía no sale de esta página: falta conectar el buzón.";
+      sentEl.textContent = "Preparando tu cotización...";
+      try {
+        const response = await fetch(QUOTE_URL, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            nombre: data.get("nombre"),
+            correo: data.get("correo"),
+            portadaDigital: document.querySelector("#cover-digital").checked,
+            portadaImpresa: document.querySelector("#cover-print").checked,
+            epub: document.querySelector("#layout-epub").checked,
+            tapaBlanda: document.querySelector("#layout-print").checked,
+            publicarKdp: q.publish,
+            paginaAutor: document.querySelector("#author-page").checked,
+          }),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          locked = false;
+          submitEl.disabled = false;
+          sentEl.textContent = payload.error || "No pude enviar el correo. Intenta de nuevo.";
+          return;
+        }
+        submitEl.hidden = true;
+        sentEl.textContent = "La cotización, con todos los detalles e instrucciones de pago, fue enviada a " + data.get("correo") + ".";
+      } catch {
+        locked = false;
+        submitEl.disabled = false;
+        sentEl.textContent = "No pude enviar el correo. Intenta de nuevo.";
+      }
     });
 
     render();
