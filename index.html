@@ -80,6 +80,25 @@
       height: auto;
       max-width: 100%;
       max-height: calc(100dvh - 4rem);
+      animation: levitate 8s ease-in-out infinite;
+    }
+
+    @keyframes levitate {
+      0%, 100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 8px 3px rgba(26, 24, 20, 0.7));
+      }
+      50% {
+        transform: translateY(-18px);
+        filter: drop-shadow(0 24px 8px rgba(26, 24, 20, 0.45));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dragon {
+        animation: none;
+        filter: drop-shadow(0 8px 3px rgba(26, 24, 20, 0.7));
+      }
     }
 
     .intro,
