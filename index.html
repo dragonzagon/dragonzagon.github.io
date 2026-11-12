@@ -275,6 +275,14 @@
       line-height: 1.35;
     }
 
+    .submit-note {
+      margin: -0.5rem 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-style: italic;
+      line-height: 1.35;
+    }
+
     @media (max-width: 760px) {
       .hero {
         grid-template-columns: 1fr;
@@ -345,6 +353,7 @@
         <input name="correo" type="email" autocomplete="email" required>
       </label>
       <button type="submit">Quiero este paquete</button>
+      <p class="submit-note">Te llegará por correo la cotización, las condiciones de pago y el detalle de la entrega.</p>
       <p id="sent" hidden></p>
     </form>
   </main>
