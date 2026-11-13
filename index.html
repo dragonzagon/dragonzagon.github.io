@@ -392,6 +392,7 @@
     const hintEl = document.querySelector("#hint");
     const sentEl = document.querySelector("#sent");
     const submitEl = document.querySelector("#paquete button");
+    const submitNoteEl = document.querySelector(".submit-note");
     let locked = false;
 
     function quote() {
@@ -486,6 +487,7 @@
           return;
         }
         submitEl.hidden = true;
+        submitNoteEl.hidden = true;
         sentEl.textContent = "La cotización, con todos los detalles e instrucciones de pago, fue enviada a " + data.get("correo") + ".";
       } catch {
         locked = false;
